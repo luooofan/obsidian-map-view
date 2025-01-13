@@ -58,7 +58,7 @@ export type PluginSettings = {
     urlParsingRules?: UrlParsingRule[];
     mapControls?: MapControls;
     maxClusterRadiusPixels: number;
-    searchProvider?: 'osm' | 'google';
+    searchProvider?: 'osm' | 'google' | '高德';
     geocodingApiKey?: string;
     useGooglePlaces?: boolean;
     saveHistory?: boolean;
@@ -128,7 +128,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
         mapZoom: 1.0,
         mapCenter: new LatLng(40.44694705960048, -180.70312500000003),
         query: '',
-        chosenMapSource: 0,
+        chosenMapSource: 1,
         showLinks: false,
         linkColor: 'red',
     },
@@ -211,13 +211,20 @@ export const DEFAULT_SETTINGS: PluginSettings = {
         presetsDisplayed: false,
     },
     maxClusterRadiusPixels: 20,
-    searchProvider: 'osm',
+    searchProvider: '高德',
+    geocodingApiKey: '',
     useGooglePlaces: false,
     mapSources: [
         {
             name: 'CartoDB',
             urlLight:
                 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+            preset: true,
+        },
+        {
+            name: '高德',
+            urlLight:
+                'http://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7', // wprd0{1-4}
             preset: true,
         },
     ],

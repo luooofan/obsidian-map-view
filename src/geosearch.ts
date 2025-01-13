@@ -83,6 +83,25 @@ export class GeoSearcher {
                     e.message
                 );
             }
+        } else if (
+            this.settings.searchProvider == '高德' &&
+            this.settings.geocodingApiKey
+        ) {
+            try {
+                const placesResults = await gaodePlacesSearch(
+                    query,
+                    this.settings,
+                    searchArea?.getCenter()
+                );
+                for (const result of placesResults)
+                    results.push({
+                        name: result.name,
+                        location: result.location,
+                        resultType: 'searchResult',
+                    });
+            } catch (e) {
+                console.log('Map View: gaode search failed: ', e.message);
+            }
         } else {
             const areaSW = searchArea?.getSouthWest() || null;
             const areaNE = searchArea?.getNorthEast() || null;
@@ -145,6 +164,48 @@ export async function googlePlacesSearch(
                 );
                 results.push({
                     name: `${result?.name} (${result?.formatted_address})`,
+                    location: geolocation,
+                    resultType: 'searchResult',
+                } as GeoSearchResult);
+            }
+        }
+    }
+    return results;
+}
+
+export async function gaodePlacesSearch(
+    query: string,
+    settings: PluginSettings,
+    centerOfSearch: leaflet.LatLng | null
+): Promise<GeoSearchResult[]> {
+    if (settings.searchProvider != '高德') return [];
+    const googleApiKey = settings.geocodingApiKey;
+    const params = {
+        key: googleApiKey,
+        keywords: query,
+    };
+    // if (centerOfSearch)
+    //     (params as any)[
+    //         'location'
+    //     ] = `${centerOfSearch.lat},${centerOfSearch.lng}`;
+
+    const gaodeUrl =
+        'https://restapi.amap.com/v5/place/text?' +
+        querystring.stringify(params);
+    const gaodeContent = await request({ url: gaodeUrl });
+    const jsonContent = JSON.parse(gaodeContent) as any;
+    let results: GeoSearchResult[] = [];
+    if (jsonContent && 'pois' in jsonContent && jsonContent?.pois.length > 0) {
+        for (const poi of jsonContent.pois) {
+            if (poi.location) {
+                const locationParts = poi.location.split(',');
+                const lng = parseFloat(locationParts[0]);
+                const lat = parseFloat(locationParts[1]);
+                const geolocation = new leaflet.LatLng(lat, lng);
+                // console.log(`${poi?.name} 经度: ${lng}, 纬度: ${lat}`);
+
+                results.push({
+                    name: `${poi?.name} (${poi?.cityname} ${poi?.adname} ${poi?.address})`,
                     location: geolocation,
                     resultType: 'searchResult',
                 } as GeoSearchResult);
