@@ -64,16 +64,19 @@ export class SettingsTab extends PluginSettingTab {
                 component
                     .addOption('osm', 'OpenStreetMap')
                     .addOption('google', 'Google (API key required)')
+                    .addOption('高德', '高德地图（需要 API key）')
                     .setValue(
                         this.plugin.settings.searchProvider ||
                             DEFAULT_SETTINGS.searchProvider,
                     )
-                    .onChange(async (value: 'osm' | 'google') => {
+                    .onChange(async (value: 'osm' | 'google' | '高德') => {
                         this.plugin.settings.searchProvider = value;
                         await this.plugin.saveSettings();
                         this.refreshPluginOnHide = true;
                         apiKeyControl.settingEl.style.display =
-                            value === 'google' ? '' : 'none';
+                            value === 'google' || value === '高德'
+                                ? ''
+                                : 'none';
                         googlePlacesControl.settingEl.style.display =
                             this.plugin.settings.searchProvider === 'google'
                                 ? ''
@@ -84,7 +87,7 @@ export class SettingsTab extends PluginSettingTab {
         apiKeyControl = new Setting(containerEl)
             .setName('Gecoding API key')
             .setDesc(
-                'If using Google as the geocoding search provider, paste the API key here. See the plugin documentation for more details. Changes are applied after restart.',
+                'If using Google/高德 as the geocoding search provider, paste the API key here. See the plugin documentation for more details. Changes are applied after restart.',
             )
             .addText((component) => {
                 component
@@ -120,7 +123,10 @@ export class SettingsTab extends PluginSettingTab {
 
         // Display the API key control only if the search provider requires it
         apiKeyControl.settingEl.style.display =
-            this.plugin.settings.searchProvider === 'google' ? '' : 'none';
+            this.plugin.settings.searchProvider === 'google' ||
+            this.plugin.settings.searchProvider === '高德'
+                ? ''
+                : 'none';
         googlePlacesControl.settingEl.style.display =
             this.plugin.settings.searchProvider === 'google' ? '' : 'none';
         new Setting(containerEl)

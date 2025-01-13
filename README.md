@@ -1,5 +1,12 @@
 # Obsidian.md Map View
 
+相比原仓库：
+
+- 新增了高德作为默认 MapSource
+- 新增了高德作为默认 GeoSearcher，需要 API key（[高德开放平台 | 高德地图 API](https://lbs.amap.com/)）
+
+# ORIG README
+
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/esm7)
 
 ## Intro
